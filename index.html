@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minimal — Strona główna i generator haseł</title>
+  <meta name="description" content="Minimalistyczna aplikacja webowa z generatorem haseł.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="logo" href="#home" data-tab-link="home" aria-label="Minimal — strona główna">
+        <span class="logo__mark"></span>
+        <span class="logo__text">minimal</span>
+      </a>
+
+      <nav class="tabs" aria-label="Główna nawigacja">
+        <button class="tab is-active" data-tab="home" type="button">Strona główna</button>
+        <button class="tab" data-tab="password" type="button">Generator haseł</button>
+      </nav>
+
+      <div class="topbar__right">
+        <div class="clock" aria-live="off">
+          <span id="clock-time" class="clock__time">--:--:--</span>
+          <span id="clock-date" class="clock__date">—</span>
+        </div>
+
+        <button id="theme-switch" class="switch" type="button" role="switch"
+                aria-checked="false" aria-label="Przełącz motyw jasny/ciemny">
+          <span class="switch__icon switch__icon--sun">☀</span>
+          <span class="switch__icon switch__icon--moon">☾</span>
+          <span class="switch__thumb"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+    <!-- ZAKŁADKA 1: STRONA GŁÓWNA -->
+    <section id="view-home" class="view is-active" aria-labelledby="hero-title">
+      <div class="hero">
+        <p class="eyebrow">Witaj</p>
+        <h1 id="hero-title">Prostota jest najwyższą formą&nbsp;elegancji.</h1>
+        <p class="hero__lead">
+          Tu wpiszesz własny opis. Zmień ten tekst w pliku index.html —
+          sekcja z klasą <code>.hero</code>.
+        </p>
+        <button class="btn btn--primary" type="button" data-tab-link="password">
+          Otwórz generator haseł →
+        </button>
+      </div>
+
+      <!-- KARTY ARTYKUŁÓW: skopiuj cały blok <article>, aby dodać kolejną kartę -->
+      <div class="grid">
+        <article class="card">
+          <span class="card__tag">Poradnik</span>
+          <h2 class="card__title">Tytuł pierwszego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+
+        <article class="card">
+          <span class="card__tag">Design</span>
+          <h2 class="card__title">Tytuł drugiego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+
+        <article class="card">
+          <span class="card__tag">Bezpieczeństwo</span>
+          <h2 class="card__title">Tytuł trzeciego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+
+        <article class="card">
+          <span class="card__tag">Technologia</span>
+          <h2 class="card__title">Tytuł czwartego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+
+        <article class="card">
+          <span class="card__tag">Produktywność</span>
+          <h2 class="card__title">Tytuł piątego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+
+        <article class="card">
+          <span class="card__tag">Notatki</span>
+          <h2 class="card__title">Tytuł szóstego artykułu</h2>
+          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
+          <a class="card__link" href="#">Czytaj więcej →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ZAKŁADKA 2: GENERATOR HASEŁ -->
+    <section id="view-password" class="view" aria-labelledby="pw-title" hidden>
+      <div class="widget">
+        <p class="eyebrow">Narzędzie</p>
+        <h1 id="pw-title" class="widget__title">Generator haseł</h1>
+        <p class="widget__lead">Hasła powstają lokalnie w Twojej przeglądarce i nigdzie nie są wysyłane.</p>
+
+        <div class="output">
+          <output id="pw-output" class="output__value" aria-live="polite">—</output>
+          <button id="pw-copy" class="btn btn--icon" type="button" aria-label="Kopiuj hasło do schowka">
+            <span id="pw-copy-label">Kopiuj</span>
+          </button>
+        </div>
+
+        <div class="meter" aria-hidden="true">
+          <div id="pw-meter-bar" class="meter__bar"></div>
+        </div>
+        <p id="pw-strength" class="meter__label">Siła hasła: —</p>
+
+        <div class="field">
+          <label for="pw-length" class="field__label">
+            Długość: <strong id="pw-length-value">16</strong> znaków
+          </label>
+          <input id="pw-length" class="range" type="range" min="6" max="32" value="16">
+        </div>
+
+        <fieldset class="options">
+          <legend class="sr-only">Rodzaje znaków</legend>
+          <label class="check"><input type="checkbox" id="opt-lower" checked><span>Małe litery (a–z)</span></label>
+          <label class="check"><input type="checkbox" id="opt-upper" checked><span>Wielkie litery (A–Z)</span></label>
+          <label class="check"><input type="checkbox" id="opt-digits" checked><span>Cyfry (0–9)</span></label>
+          <label class="check"><input type="checkbox" id="opt-symbols" checked><span>Symbole (!@#$…)</span></label>
+        </fieldset>
+
+        <button id="pw-generate" class="btn btn--primary btn--block" type="button">Generuj nowe hasło</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>© <span id="year"></span> minimal — zaprojektowane z dbałością o szczegóły.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
