@@ -1,151 +1,159 @@
 <!DOCTYPE html>
-<html lang="pl" data-theme="light">
+<html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Minimal — Strona główna i generator haseł</title>
-  <meta name="description" content="Minimalistyczna aplikacja webowa z generatorem haseł.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6d5dc">
+  <title>stronka testowa</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rose-100: #fdeef1;
+      --rose-200: #f8d6de;
+      --rose-300: #f2b8c6;
+      --rose-500: #d98298;
+      --ink: #5a2d3b;
+      --ink-soft: #8b5a69;
+      --glass: rgba(255, 255, 255, 0.34);
+      --glass-edge: rgba(255, 255, 255, 0.7);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+               max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+      overflow: hidden;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--rose-100), var(--rose-200) 55%, #f4c9d3);
+      background-size: 200% 200%;
+      animation: tint 26s ease-in-out infinite alternate;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ---------- Tło: miękkie, powoli unoszące się refleksy ---------- */
+    .glow {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow i {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.75;
+      will-change: transform;
+    }
+    .glow i:nth-child(1) { width: 62vmax; height: 62vmax; left: -22vmax; top: -18vmax;
+      background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0) 68%); animation: drift1 24s ease-in-out infinite alternate; }
+    .glow i:nth-child(2) { width: 54vmax; height: 54vmax; right: -20vmax; top: 12vh;
+      background: radial-gradient(circle, var(--rose-300) 0%, rgba(242,184,198,0) 68%); animation: drift2 30s ease-in-out infinite alternate; }
+    .glow i:nth-child(3) { width: 48vmax; height: 48vmax; left: -10vmax; bottom: -24vmax;
+      background: radial-gradient(circle, #f9c4d0 0%, rgba(249,196,208,0) 68%); animation: drift3 28s ease-in-out infinite alternate; }
+    .glow i:nth-child(4) { width: 34vmax; height: 34vmax; right: 8vmax; bottom: -10vmax;
+      background: radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 66%); animation: drift1 34s ease-in-out infinite alternate-reverse; }
+
+    @keyframes tint  { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
+    @keyframes drift1 { to { transform: translate3d(14vmax, 10vmax, 0) scale(1.15); } }
+    @keyframes drift2 { to { transform: translate3d(-16vmax, -8vmax, 0) scale(0.9); } }
+    @keyframes drift3 { to { transform: translate3d(12vmax, -14vmax, 0) scale(1.2); } }
+
+    /* ---------- Karta ze szkła ---------- */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 640px);
+      padding: clamp(40px, 9vw, 84px) clamp(24px, 7vw, 72px);
+      text-align: center;
+      background: var(--glass);
+      border: 1px solid var(--glass-edge);
+      border-radius: clamp(24px, 6vw, 40px);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      backdrop-filter: blur(22px) saturate(140%);
+      box-shadow:
+        0 30px 80px -24px rgba(180, 90, 115, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+      opacity: 0;
+      animation: enter 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+    }
+
+    .title {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      font-size: clamp(2.4rem, 11vw, 4.6rem);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+      color: var(--ink);
+    }
+
+    .subtitle {
+      margin: clamp(18px, 4vw, 28px) auto 0;
+      max-width: 30ch;
+      font-weight: 300;
+      font-size: clamp(0.98rem, 3.8vw, 1.15rem);
+      line-height: 1.7;
+      color: var(--ink-soft);
+      opacity: 0;
+      animation: fade 1.4s ease 1.2s forwards;
+    }
+
+    .heart {
+      display: block;
+      width: 26px;
+      height: 26px;
+      margin: 0 auto clamp(18px, 4vw, 28px);
+      fill: var(--rose-500);
+      opacity: 0;
+      animation: fade 1.2s ease 0.9s forwards, beat 3.6s ease-in-out 2.2s infinite;
+    }
+
+    /* Wejście: płynne powiększenie + fade-in + wyostrzenie */
+    @keyframes enter {
+      from { opacity: 0; transform: scale(0.86) translateY(14px); filter: blur(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+    @keyframes fade { to { opacity: 1; } }
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      12% { transform: scale(1.18); }
+      24% { transform: scale(1); }
+    }
+
+    @media (max-width: 480px) {
+      .glow i { filter: blur(36px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
 </head>
 <body>
-  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
-  <header class="topbar">
-    <div class="topbar__inner">
-      <a class="logo" href="#home" data-tab-link="home" aria-label="Minimal — strona główna">
-        <span class="logo__mark"></span>
-        <span class="logo__text">minimal</span>
-      </a>
+  <main class="card">
+    <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21s-7.5-4.6-9.6-9.3C.8 8.1 2.9 4.5 6.5 4.5c2 0 3.6 1 5.5 3.1 1.9-2.1 3.5-3.1 5.5-3.1 3.6 0 5.7 3.6 4.1 7.2C19.5 16.4 12 21 12 21z"/>
+    </svg>
 
-      <nav class="tabs" aria-label="Główna nawigacja">
-        <button class="tab is-active" data-tab="home" type="button">Strona główna</button>
-        <button class="tab" data-tab="password" type="button">Generator haseł</button>
-      </nav>
-
-      <div class="topbar__right">
-        <div class="clock" aria-live="off">
-          <span id="clock-time" class="clock__time">--:--:--</span>
-          <span id="clock-date" class="clock__date">—</span>
-        </div>
-
-        <button id="theme-switch" class="switch" type="button" role="switch"
-                aria-checked="false" aria-label="Przełącz motyw jasny/ciemny">
-          <span class="switch__icon switch__icon--sun">☀</span>
-          <span class="switch__icon switch__icon--moon">☾</span>
-          <span class="switch__thumb"></span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="content">
-    <!-- ZAKŁADKA 1: STRONA GŁÓWNA -->
-    <section id="view-home" class="view is-active" aria-labelledby="hero-title">
-      <div class="hero">
-        <p class="eyebrow">Witaj</p>
-        <h1 id="hero-title">Prostota jest najwyższą formą&nbsp;elegancji.</h1>
-        <p class="hero__lead">
-          Tu wpiszesz własny opis. Zmień ten tekst w pliku index.html —
-          sekcja z klasą <code>.hero</code>.
-        </p>
-        <button class="btn btn--primary" type="button" data-tab-link="password">
-          Otwórz generator haseł →
-        </button>
-      </div>
-
-      <!-- KARTY ARTYKUŁÓW: skopiuj cały blok <article>, aby dodać kolejną kartę -->
-      <div class="grid">
-        <article class="card">
-          <span class="card__tag">Poradnik</span>
-          <h2 class="card__title">Tytuł pierwszego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Design</span>
-          <h2 class="card__title">Tytuł drugiego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Bezpieczeństwo</span>
-          <h2 class="card__title">Tytuł trzeciego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Technologia</span>
-          <h2 class="card__title">Tytuł czwartego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Produktywność</span>
-          <h2 class="card__title">Tytuł piątego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Notatki</span>
-          <h2 class="card__title">Tytuł szóstego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-      </div>
-    </section>
-
-    <!-- ZAKŁADKA 2: GENERATOR HASEŁ -->
-    <section id="view-password" class="view" aria-labelledby="pw-title" hidden>
-      <div class="widget">
-        <p class="eyebrow">Narzędzie</p>
-        <h1 id="pw-title" class="widget__title">Generator haseł</h1>
-        <p class="widget__lead">Hasła powstają lokalnie w Twojej przeglądarce i nigdzie nie są wysyłane.</p>
-
-        <div class="output">
-          <output id="pw-output" class="output__value" aria-live="polite">—</output>
-          <button id="pw-copy" class="btn btn--icon" type="button" aria-label="Kopiuj hasło do schowka">
-            <span id="pw-copy-label">Kopiuj</span>
-          </button>
-        </div>
-
-        <div class="meter" aria-hidden="true">
-          <div id="pw-meter-bar" class="meter__bar"></div>
-        </div>
-        <p id="pw-strength" class="meter__label">Siła hasła: —</p>
-
-        <div class="field">
-          <label for="pw-length" class="field__label">
-            Długość: <strong id="pw-length-value">16</strong> znaków
-          </label>
-          <input id="pw-length" class="range" type="range" min="6" max="32" value="16">
-        </div>
-
-        <fieldset class="options">
-          <legend class="sr-only">Rodzaje znaków</legend>
-          <label class="check"><input type="checkbox" id="opt-lower" checked><span>Małe litery (a–z)</span></label>
-          <label class="check"><input type="checkbox" id="opt-upper" checked><span>Wielkie litery (A–Z)</span></label>
-          <label class="check"><input type="checkbox" id="opt-digits" checked><span>Cyfry (0–9)</span></label>
-          <label class="check"><input type="checkbox" id="opt-symbols" checked><span>Symbole (!@#$…)</span></label>
-        </fieldset>
-
-        <button id="pw-generate" class="btn btn--primary btn--block" type="button">Generuj nowe hasło</button>
-      </div>
-    </section>
+    <!-- ✏️ ZMIEŃ TEKSTY PONIŻEJ -->
+    <h1 class="title">Kocham cie zuziu</h1>
+    <p class="subtitle">fajne co??</p>
   </main>
-
-  <footer class="footer">
-    <small>© <span id="year"></span> minimal — zaprojektowane z dbałością o szczegóły.</small>
-  </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
