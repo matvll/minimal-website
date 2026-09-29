@@ -250,6 +250,57 @@ code {
   .options { grid-template-columns: 1fr; }
 }
 
+/* ===== Logowanie ===== */
+[hidden] { display: none !important; }
+
+.segmented {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  padding: 4px; margin-bottom: 24px;
+  border-radius: 999px; background: var(--border);
+}
+.segmented__btn {
+  font: inherit; font-size: 0.875rem; font-weight: 500;
+  padding: 9px 12px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; transition: all 0.3s var(--ease);
+}
+.segmented__btn.is-active {
+  background: var(--surface-solid); color: var(--text);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+}
+
+.input { margin-bottom: 18px; }
+.input label {
+  display: block; margin-bottom: 8px;
+  font-size: 0.85rem; font-weight: 500; color: var(--text-muted);
+}
+.input input {
+  width: 100%; font: inherit; font-size: 1rem; /* 16px – bez zoomu na iOS */
+  padding: 13px 16px; border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-solid); color: var(--text);
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.5s;
+}
+.input input::placeholder { color: var(--text-muted); opacity: 0.6; }
+.input input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--border);
+}
+.input__row { position: relative; }
+.input__row input { padding-right: 84px; }
+.input__toggle {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font: inherit; font-size: 0.8rem; font-weight: 600;
+  padding: 6px 10px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--text-muted); cursor: pointer;
+}
+.input__toggle:hover { color: var(--text); }
+
+.auth__msg { min-height: 1.4em; margin: -4px 0 16px; font-size: 0.85rem; color: #c0392b; }
+[data-theme="dark"] .auth__msg { color: #ff8a7a; }
+.auth__hint { margin-top: 20px; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+.auth__hint a { color: var(--text); font-weight: 600; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
 }

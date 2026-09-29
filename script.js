@@ -34,7 +34,7 @@
      2. ZAKŁADKI
      ========================================================= */
   const tabs = $$(".tab");
-  const views = { home: $("#view-home"), password: $("#view-password") };
+  const views = { home: $("#view-home"), password: $("#view-password"), login: $("#view-login") };
 
   function showTab(name) {
     if (!views[name]) return;
@@ -285,6 +285,118 @@
   els.generate.addEventListener("click", generatePassword);
   els.copy.addEventListener("click", copyPassword);
 
+    /* =========================================================
+     5b. LOGOWANIE / REJESTRACJA (demo działające w przeglądarce)
+     ========================================================= */
+  (() => {
+    const USERS_KEY = "minimal.users";
+    const SESSION_KEY = "minimal.session";
+
+    const el = {
+      guest: $("#auth-guest"), user: $("#auth-user"), form: $("#auth-form"),
+      title: $("#auth-title"), lead: $("#auth-lead"),
+      name: $("#auth-name"), email: $("#auth-email"),
+      pass: $("#auth-pass"), pass2: $("#auth-pass2"), toggle: $("#auth-toggle"),
+      msg: $("#auth-msg"), submit: $("#auth-submit"),
+      userName: $("#auth-user-name"), userEmail: $("#auth-user-email"), logout: $("#auth-logout"),
+      modeBtns: $$("[data-auth-mode]"), registerOnly: $$("[data-only='register']"),
+      tab: $('.tab[data-tab="login"]'),
+    };
+
+    let mode = "login";
+
+    const readUsers = () => { try { return JSON.parse(safeStorage.get(USERS_KEY)) || {}; } catch { return {}; } };
+    const saveUsers = (u) => safeStorage.set(USERS_KEY, JSON.stringify(u));
+    const say = (text) => { el.msg.textContent = text; };
+
+    const toHex = (bytes) => [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
+    const newSalt = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
+
+    // Hasło nigdy nie jest zapisywane jawnie — tylko wynik PBKDF2 z solą
+    async function hashPassword(password, salt) {
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
+      const bits = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt: enc.encode(salt), iterations: 150000, hash: "SHA-256" }, key, 256);
+      return toHex(new Uint8Array(bits));
+    }
+
+    function setMode(next) {
+      mode = next;
+      const reg = next === "register";
+      el.modeBtns.forEach((b) => {
+        const on = b.dataset.authMode === next;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-selected", String(on));
+      });
+      el.registerOnly.forEach((n) => (n.hidden = !reg));
+      el.title.textContent = reg ? "Utwórz konto" : "Zaloguj się";
+      el.lead.textContent = reg ? "Wystarczy imię, e-mail i hasło." : "Wpisz dane, aby wejść na swoje konto.";
+      el.submit.textContent = reg ? "Utwórz konto" : "Zaloguj się";
+      el.pass.autocomplete = reg ? "new-password" : "current-password";
+      say("");
+    }
+
+    function render() {
+      const email = safeStorage.get(SESSION_KEY);
+      const user = email ? readUsers()[email] : null;
+      el.guest.hidden = !!user;
+      el.user.hidden = !user;
+      if (user) { el.userName.textContent = user.name; el.userEmail.textContent = email; }
+      el.tab.textContent = user ? user.name.slice(0, 14) : "Logowanie";
+      say("");
+    }
+
+    el.modeBtns.forEach((b) => b.addEventListener("click", () => setMode(b.dataset.authMode)));
+
+    el.toggle.addEventListener("click", () => {
+      const show = el.pass.type === "password";
+      el.pass.type = el.pass2.type = show ? "text" : "password";
+      el.toggle.textContent = show ? "Ukryj" : "Pokaż";
+      el.toggle.setAttribute("aria-label", show ? "Ukryj hasło" : "Pokaż hasło");
+    });
+
+    el.form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = el.email.value.trim().toLowerCase();
+      const password = el.pass.value;
+      const users = readUsers();
+
+      if (!/^\S+@\S+\.\S+$/.test(email)) return say("Podaj poprawny adres e-mail.");
+      if (password.length < 8) return say("Hasło musi mieć co najmniej 8 znaków.");
+
+      try {
+        if (mode === "register") {
+          const name = el.name.value.trim();
+          if (!name) return say("Podaj imię.");
+          if (password !== el.pass2.value) return say("Hasła nie są takie same.");
+          if (users[email]) return say("Konto z tym adresem już istnieje. Zaloguj się.");
+          const salt = newSalt();
+          users[email] = { name, salt, hash: await hashPassword(password, salt) };
+          saveUsers(users);
+        } else {
+          const u = users[email];
+          if (!u || (await hashPassword(password, u.salt)) !== u.hash) {
+            return say("Nieprawidłowy e-mail lub hasło.");
+          }
+        }
+        safeStorage.set(SESSION_KEY, email);
+        el.form.reset();
+        render();
+      } catch {
+        say("Nie udało się przetworzyć hasła. Otwórz stronę przez https lub localhost.");
+      }
+    });
+
+    el.logout.addEventListener("click", () => {
+      safeStorage.set(SESSION_KEY, "");
+      setMode("login");
+      render();
+    });
+
+    setMode("login");
+    render();
+  })();
   /* =========================================================
      6. START
      ========================================================= */
