@@ -285,13 +285,10 @@
   els.generate.addEventListener("click", generatePassword);
   els.copy.addEventListener("click", copyPassword);
 
-    /* =========================================================
-     5b. LOGOWANIE / REJESTRACJA (demo działające w przeglądarce)
+  /* =========================================================
+     5b. LOGOWANIE / REJESTRACJA (przez serwer)
      ========================================================= */
   (() => {
-    const USERS_KEY = "minimal.users";
-    const SESSION_KEY = "minimal.session";
-
     const el = {
       guest: $("#auth-guest"), user: $("#auth-user"), form: $("#auth-form"),
       title: $("#auth-title"), lead: $("#auth-lead"),
@@ -302,23 +299,25 @@
       modeBtns: $$("[data-auth-mode]"), registerOnly: $$("[data-only='register']"),
       tab: $('.tab[data-tab="login"]'),
     };
-
     let mode = "login";
+    const say = (t) => { el.msg.textContent = t; };
 
-    const readUsers = () => { try { return JSON.parse(safeStorage.get(USERS_KEY)) || {}; } catch { return {}; } };
-    const saveUsers = (u) => safeStorage.set(USERS_KEY, JSON.stringify(u));
-    const say = (text) => { el.msg.textContent = text; };
-
-    const toHex = (bytes) => [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
-    const newSalt = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
-
-    // Hasło nigdy nie jest zapisywane jawnie — tylko wynik PBKDF2 z solą
-    async function hashPassword(password, salt) {
-      const enc = new TextEncoder();
-      const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
-      const bits = await crypto.subtle.deriveBits(
-        { name: "PBKDF2", salt: enc.encode(salt), iterations: 150000, hash: "SHA-256" }, key, 256);
-      return toHex(new Uint8Array(bits));
+    async function api(method, path, body) {
+      let res;
+      try {
+        res = await fetch("/api/" + path, {
+          method,
+          headers: body ? { "Content-Type": "application/json" } : undefined,
+          body: body ? JSON.stringify(body) : undefined,
+          credentials: "same-origin",
+        });
+      } catch {
+        throw new Error("Brak połączenia z serwerem. Uruchom go i otwórz stronę przez localhost.");
+      }
+      let data = {};
+      try { data = await res.json(); } catch { /* pusta odpowiedź */ }
+      if (!res.ok) throw new Error(data.error || "Coś poszło nie tak.");
+      return data;
     }
 
     function setMode(next) {
@@ -337,14 +336,11 @@
       say("");
     }
 
-    function render() {
-      const email = safeStorage.get(SESSION_KEY);
-      const user = email ? readUsers()[email] : null;
+    function render(user) {
       el.guest.hidden = !!user;
       el.user.hidden = !user;
-      if (user) { el.userName.textContent = user.name; el.userEmail.textContent = email; }
+      if (user) { el.userName.textContent = user.name; el.userEmail.textContent = user.email; }
       el.tab.textContent = user ? user.name.slice(0, 14) : "Logowanie";
-      say("");
     }
 
     el.modeBtns.forEach((b) => b.addEventListener("click", () => setMode(b.dataset.authMode)));
@@ -358,44 +354,38 @@
 
     el.form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = el.email.value.trim().toLowerCase();
+      const email = el.email.value.trim();
       const password = el.pass.value;
-      const users = readUsers();
 
-      if (!/^\S+@\S+\.\S+$/.test(email)) return say("Podaj poprawny adres e-mail.");
+      if (!email) return say("Podaj adres e-mail.");
       if (password.length < 8) return say("Hasło musi mieć co najmniej 8 znaków.");
+      if (mode === "register" && password !== el.pass2.value) return say("Hasła nie są takie same.");
 
+      el.submit.disabled = true;
+      say("");
       try {
-        if (mode === "register") {
-          const name = el.name.value.trim();
-          if (!name) return say("Podaj imię.");
-          if (password !== el.pass2.value) return say("Hasła nie są takie same.");
-          if (users[email]) return say("Konto z tym adresem już istnieje. Zaloguj się.");
-          const salt = newSalt();
-          users[email] = { name, salt, hash: await hashPassword(password, salt) };
-          saveUsers(users);
-        } else {
-          const u = users[email];
-          if (!u || (await hashPassword(password, u.salt)) !== u.hash) {
-            return say("Nieprawidłowy e-mail lub hasło.");
-          }
-        }
-        safeStorage.set(SESSION_KEY, email);
+        const payload = mode === "register"
+          ? { name: el.name.value, email, password }
+          : { email, password };
+        const { user } = await api("POST", mode, payload);
         el.form.reset();
-        render();
-      } catch {
-        say("Nie udało się przetworzyć hasła. Otwórz stronę przez https lub localhost.");
+        render(user);
+      } catch (err) {
+        say(err.message);
+      } finally {
+        el.submit.disabled = false;
       }
     });
 
-    el.logout.addEventListener("click", () => {
-      safeStorage.set(SESSION_KEY, "");
+    el.logout.addEventListener("click", async () => {
+      try { await api("POST", "logout", {}); } catch { /* i tak wyloguj widok */ }
       setMode("login");
-      render();
+      render(null);
     });
 
     setMode("login");
-    render();
+    render(null);
+    api("GET", "me").then((d) => render(d.user)).catch(() => render(null));
   })();
   /* =========================================================
      6. START
