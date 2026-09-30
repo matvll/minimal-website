@@ -160,8 +160,11 @@
       const hours = Math.floor((roznica % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((roznica % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((roznica % (1000 * 60)) / 1000);
-      
-      document.querySelector('.subtitle').innerHTML = `Jeszcze ${days} dni ${hours} godz ${minutes} min ${seconds} sek`;
+      if(hours<1){
+        document.querySelector('.subtitle').innerHTML = `Jeszcze ${days} dni ${minutes} min ${seconds} sek`;
+      }else{
+        document.querySelector('.subtitle').innerHTML = `Jeszcze ${days} dni ${hours} godz ${minutes} min ${seconds} sek`;
+      }
     }
     
     setInterval(odliczanko, 1000);
