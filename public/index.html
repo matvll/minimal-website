@@ -28,9 +28,27 @@
       </nav>
 
       <div class="topbar__right">
+        <button id="user-chip" class="user-chip" type="button" hidden aria-label="Otwórz konto">
+          <span id="user-chip-avatar" class="user-chip__avatar" aria-hidden="true"></span>
+          <span class="user-chip__text"><span class="user-chip__label">Użytkownik:</span> <strong id="user-chip-name"></strong></span>
+        </button>
         <div class="clock" aria-live="off">
           <span id="clock-time" class="clock__time">--:--:--</span>
           <span id="clock-date" class="clock__date">—</span>
+        </div>
+
+        <div class="accent">
+          <button id="accent-btn" class="accent__btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Wybierz kolor akcentu">
+            <span class="accent__dot"></span>
+          </button>
+          <div id="accent-menu" class="accent__menu" role="radiogroup" aria-label="Kolor akcentu" hidden>
+            <button class="swatch" type="button" role="radio" aria-checked="true"  data-accent="mono"   aria-label="Monochromatyczny"></button>
+            <button class="swatch" type="button" role="radio" aria-checked="false" data-accent="blue"   style="--c:#2563eb" aria-label="Niebieski"></button>
+            <button class="swatch" type="button" role="radio" aria-checked="false" data-accent="violet" style="--c:#7c3aed" aria-label="Fioletowy"></button>
+            <button class="swatch" type="button" role="radio" aria-checked="false" data-accent="green"  style="--c:#047857" aria-label="Zielony"></button>
+            <button class="swatch" type="button" role="radio" aria-checked="false" data-accent="rose"   style="--c:#e11d48" aria-label="Różowy"></button>
+            <button class="swatch" type="button" role="radio" aria-checked="false" data-accent="orange" style="--c:#c2410c" aria-label="Pomarańczowy"></button>
+          </div>
         </div>
 
         <button id="theme-switch" class="switch" type="button" role="switch"
@@ -59,49 +77,88 @@
 
       <!-- KARTY ARTYKUŁÓW: skopiuj cały blok <article>, aby dodać kolejną kartę -->
       <div class="grid">
-        <article class="card">
-          <span class="card__tag">Poradnik</span>
-          <h2 class="card__title">Tytuł pierwszego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
+          <article class="card card--featured">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
 
-        <article class="card">
-          <span class="card__tag">Design</span>
-          <h2 class="card__title">Tytuł drugiego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
+          <article class="card">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
 
-        <article class="card">
-          <span class="card__tag">Bezpieczeństwo</span>
-          <h2 class="card__title">Tytuł trzeciego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
+          <article class="card">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
 
-        <article class="card">
-          <span class="card__tag">Technologia</span>
-          <h2 class="card__title">Tytuł czwartego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
+          <article class="card">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
 
-        <article class="card">
-          <span class="card__tag">Produktywność</span>
-          <h2 class="card__title">Tytuł piątego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-
-        <article class="card">
-          <span class="card__tag">Notatki</span>
-          <h2 class="card__title">Tytuł szóstego artykułu</h2>
-          <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią — kilka zdań wystarczy.</p>
-          <a class="card__link" href="#">Czytaj więcej →</a>
-        </article>
-      </div>
-    </section>
+          <article class="card">
+            <div class="card__media" aria-hidden="true"></div>
+            <div class="card__body">
+              <div class="card__meta">
+                <span class="card__tag">Poradnik</span>
+                <time datetime="2026-09-30">30 września 2026</time>
+                <span>5 min czytania</span>
+              </div>
+              <h2 class="card__title">Tytuł artykułu</h2>
+              <p class="card__text">Krótki opis artykułu. Zastąp ten tekst własną treścią.</p>
+              <a class="card__link" href="#">Czytaj więcej</a>
+            </div>
+          </article>
 
     <!-- ZAKŁADKA 2: GENERATOR HASEŁ -->
     <section id="view-password" class="view" aria-labelledby="pw-title" hidden>

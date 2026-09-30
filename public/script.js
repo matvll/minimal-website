@@ -30,6 +30,33 @@
     applyTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
   });
 
+    /* =========================================================
+     1b. KOLOR AKCENTU
+     ========================================================= */
+  const accentBtn = $("#accent-btn");
+  const accentMenu = $("#accent-menu");
+  const swatches = $$(".swatch");
+  const ACCENTS = swatches.map((s) => s.dataset.accent);
+
+  function applyAccent(name) {
+    if (!ACCENTS.includes(name)) name = "mono";
+    root.setAttribute("data-accent", name);
+    swatches.forEach((s) => s.setAttribute("aria-checked", String(s.dataset.accent === name)));
+    safeStorage.set("accent", name);
+    background.updateColors();
+  }
+  function toggleAccentMenu(open) {
+    accentMenu.hidden = !open;
+    accentBtn.setAttribute("aria-expanded", String(open));
+  }
+  accentBtn.addEventListener("click", () => toggleAccentMenu(accentMenu.hidden));
+  swatches.forEach((s) => s.addEventListener("click", () => {
+    applyAccent(s.dataset.accent);
+    toggleAccentMenu(false);
+  }));
+  document.addEventListener("click", (e) => { if (!e.target.closest(".accent")) toggleAccentMenu(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") toggleAccentMenu(false); });
+
   /* =========================================================
      2. ZAKŁADKI
      ========================================================= */
@@ -340,8 +367,16 @@
       el.guest.hidden = !!user;
       el.user.hidden = !user;
       if (user) { el.userName.textContent = user.name; el.userEmail.textContent = user.email; }
-      el.tab.textContent = user ? user.name.slice(0, 14) : "Logowanie";
+      el.tab.textContent = user ? "Konto" : "Logowanie";
+
+      const chip = $("#user-chip");
+      chip.hidden = !user;
+      if (user) {
+        $("#user-chip-name").textContent = user.name;
+        $("#user-chip-avatar").textContent = user.name.trim().charAt(0).toUpperCase();
+      }
     }
+    $("#user-chip").addEventListener("click", () => showTab("login"));
 
     el.modeBtns.forEach((b) => b.addEventListener("click", () => setMode(b.dataset.authMode)));
 
@@ -387,11 +422,49 @@
     render(null);
     api("GET", "me").then((d) => render(d.user)).catch(() => render(null));
   })();
+
+    /* =========================================================
+     5c. KARTY: pojawianie się, poświata i przechylanie
+     ========================================================= */
+  (() => {
+    const cards = $$(".card");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    if ("IntersectionObserver" in window && !reduce) {
+      root.classList.add("js-reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.15 });
+      cards.forEach((c, i) => { c.style.setProperty("--d", (i % 3) * 90 + "ms"); io.observe(c); });
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener("pointermove", (e) => {
+        const r = card.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        card.style.setProperty("--mx", x + "px");
+        card.style.setProperty("--my", y + "px");
+        if (fine && !reduce) {
+          card.style.setProperty("--ry", ((x / r.width - 0.5) * 6).toFixed(2) + "deg");
+          card.style.setProperty("--rx", ((0.5 - y / r.height) * 6).toFixed(2) + "deg");
+        }
+      });
+      card.addEventListener("pointerleave", () => {
+        card.style.setProperty("--rx", "0deg");
+        card.style.setProperty("--ry", "0deg");
+      });
+    });
+  })();
+
   /* =========================================================
      6. START
      ========================================================= */
   $("#year").textContent = new Date().getFullYear();
   applyTheme(preferred);
+  applyAccent(safeStorage.get("accent") || "mono");
   background.start();
   generatePassword();
 
