@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6d5dc">
+  <title>Odliczanie Do Końca Pierdolnika</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --rose-100: #fdeef1;
+      --rose-200: #f8d6de;
+      --rose-300: #f2b8c6;
+      --rose-500: #d98298;
+      --ink: #5a2d3b;
+      --ink-soft: #8b5a69;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      overflow: hidden;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, var(--rose-100), var(--rose-200) 55%, #f4c9d3);
+      background-size: 200% 200%;
+      animation: tint 26s ease-in-out infinite alternate;
+    }
+
+    .glow {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow i {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.75;
+    }
+    .glow i:nth-child(1) { width: 62vmax; height: 62vmax; left: -22vmax; top: -18vmax; background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0) 68%); }
+    .glow i:nth-child(2) { width: 54vmax; height: 54vmax; right: -20vmax; top: 12vh; background: radial-gradient(circle, var(--rose-300) 0%, rgba(242,184,198,0) 68%); }
+
+    @keyframes tint { from { background-position: 0% 30%; } to { background-position: 100% 70%; } }
+
+    /* ---------- Karta w kształcie serca (SVG Mask / Background) ---------- */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: min(90vw, 460px);
+      aspect-ratio: 1 / 0.95;
+      padding: 60px 40px;
+      text-align: center;
+      
+      /* Szklany efekt wewnątrz serca */
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(20px) saturate(140%);
+      -webkit-backdrop-filter: blur(20px) saturate(140%);
+      
+      /* Magia SVG maskująca cały kontener w idealne serce */
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.3C.8 8.1 2.9 4.5 6.5 4.5c2 0 3.6 1 5.5 3.1 1.9-2.1 3.5-3.1 5.5-3.1 3.6 0 5.7 3.6 4.1 7.2C19.5 16.4 12 21 12 21z'/%3E%3C/svg%3E");
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.3C.8 8.1 2.9 4.5 6.5 4.5c2 0 3.6 1 5.5 3.1 1.9-2.1 3.5-3.1 5.5-3.1 3.6 0 5.7 3.6 4.1 7.2C19.5 16.4 12 21 12 21z'/%3E%3C/svg%3E");
+      mask-size: contain;
+      -webkit-mask-size: contain;
+      mask-repeat: no-repeat;
+      -webkit-mask-repeat: no-repeat;
+      mask-position: center;
+      -webkit-mask-position: center;
+
+      box-shadow: 0 20px 50px -15px rgba(180, 90, 115, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      animation: enter 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+    }
+
+    .title {
+      margin: 0 0 10px 0;
+      font-family: consolas, monospace;
+      font-weight: 500;
+      font-size: clamp(2rem, 6vw, 2.8rem);
+      color: var(--ink);
+    }
+
+    .subtitle {
+      margin: 10px auto;
+      font-weight: 300;
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      color: var(--ink-soft);
+    }
+
+    .footer-text {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--ink-soft);
+      opacity: 0.7;
+    }
+
+    .heart {
+      display: block;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 8px;
+      fill: var(--rose-500);
+      animation: beat 3.6s ease-in-out infinite;
+    }
+
+    @keyframes enter {
+      from { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      12% { transform: scale(1.18); }
+      24% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+  <main class="card">
+
+
+    <h1 class="title">Odliczanie</h1>
+    <p class="subtitle">Ładowanie...</p>
+    <p class="footer-text">jebac ten pierdolnik</p>
+  </main>
+  
+  <script>
+    const koniecszkoly = new Date("April 30, 2027 00:00:00").getTime();
+
+    function odliczanko(){
+      const teraz = new Date().getTime();
+      const roznica = koniecszkoly - teraz;
+
+      if (roznica < 0 ){
+        document.querySelector('.subtitle').innerHTML = 'Koniec Szkoly!!';
+        return;
+      }
+
+      const days = Math.floor(roznica / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((roznica % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((roznica % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((roznica % (1000 * 60)) / 1000);
+      
+      document.querySelector('.subtitle').innerHTML = `Jeszcze ${days} dni ${hours} godz ${minutes} min ${seconds} sek`;
+    }
+    
+    setInterval(odliczanko, 1000);
+    odliczanko();
+  </script>
+</body>
+</html>
